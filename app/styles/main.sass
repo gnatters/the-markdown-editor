@@ -1,0 +1,254 @@
+$header_height: 25px
+$footer_height: 0px
+
+@font-face
+  font-family: 'Droid Sans Mono'
+  font-style: normal
+  font-weight: 400
+  src: local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff')
+
+
+@mixin no-select
+  -webkit-user-select: none  /* Chrome all / Safari all */
+  -moz-user-select: none     /* Firefox all */
+  -ms-user-select: none      /* IE 10+ */
+  -o-user-select: none
+  user-select: none
+
+@mixin header-gradient($c1, $c2, $c3)
+  background: $c1 /* Old browsers */
+  background: -moz-linear-gradient(top,  $c1 0%, $c2 53%, $c3 100%) /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, $c1), color-stop(53%, $c2), color-stop(100%, $c3)) /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  $c1 0%, $c2 53%, $c3 100%) /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  $c1 0%, $c2 53%, $c3 100%) /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  $c1 0%, $c2 53%, $c3 100%) /* IE10+ */
+  background: linear-gradient(to bottom,  $c1 0%, $c2 53%, $c3 100%) /* W3C */
+
+@mixin header-box-shadow
+  -moz-box-shadow: 0px 1px 2px #000
+  -webkit-box-shadow: 0px 1px 2px #000
+  box-shadow: 0px 1px 2px #000
+
+html, body
+  margin: 0
+  padding: 0
+  height: 100%
+
+#container
+  margin: 0 auto
+  height: 100%
+  padding: $header_height 0 $footer_height 0
+  -moz-box-sizing: border-box
+  -webkit-box-sizing: border-box
+  box-sizing: border-box
+
+#header
+  font-size: 1em
+  position: fixed
+  display: block
+  z-index: 20
+  top: 0
+  left: -1%
+  width: 102%
+  padding: 0 1%
+  height: $header_height
+  max-height: $header_height
+  overflow: visible
+  @include no-select
+  @include header-box-shadow
+  @include header-gradient(rgba(221,221,219,1), rgba(181,181,181,1), rgba(160,160,160,1))
+  span
+    display: inline-block
+    margin: 2px 10px
+    padding: 0
+    color: #333
+    text-shadow: 0px 1px 2px #ffffff
+  #theme-selector
+    display: inline-block
+    position: fixed
+    margin: 0
+    padding: 0
+    top: 0
+    span
+      font-size: 0.9em
+      text-align: center
+      text-shadow: none
+      font-weight: 600
+      margin: 0
+      padding: 4px 10px
+      height: $header_height - 8px
+    span:hover
+      @include header-gradient(rgba(130,220,130,1), rgba(110,170,110,1), rgba(90,150,90,1))
+    ul
+      margin: 0
+      padding: 0
+      background-color: rgba(160,160,160,1)
+      border-bottom-left-radius: 5px
+      border-bottom-right-radius: 5px
+      @include header-box-shadow
+      @include header-gradient(rgba(160,160,160,1), rgba(185,185,185,1), rgba(195,195,195,1)) //rgba(221,221,219,1), rgba(181,181,181,1), rgba(160,160,160,1)
+      li:last-child
+        border-bottom-left-radius: 4px
+        border-bottom-right-radius: 4px
+    li
+      margin: 0
+      font-size: 0.9em
+      padding: 5px 7px 4px 20px
+      list-style: none
+    li:hover
+      @include header-gradient(rgba(130,220,130,1), rgba(110,170,110,1), rgba(90,150,90,1))
+    input
+      position: relative
+      top: -1px
+      width: 100px
+      border-radius: 4px
+      border: solid 1px
+      height: 20px
+      vertical-align: middle
+      margin: 0
+      padding: 0 3px
+      font-size: 0.7em
+    .active_style::before
+      position: absolute
+      font-size: 0.9em
+      left: 4px
+      content: '➜'
+      list-style: square
+
+#messagearea
+  display: block
+  border-bottom-left-radius: 7px
+  border-bottom-right-radius: 7px
+  position: fixed
+  top: 0
+  width: 50%
+  left: 25%
+  right: 25%
+  padding: 7px 12px 3px 12px
+  box-sizing: border-box
+  background-color: green
+  z-index: 15
+  // -moz-box-shadow: 0px 1px 1px #000
+  // -webkit-box-shadow: 0px 1px 4px #000
+  // box-shadow: 0px 1px 4px #000
+  border: solid 2px rgba(70,120,70,1)
+  @include header-gradient(rgba(130,220,130,1), rgba(110,170,110,1), rgba(90,150,90,1))
+  color: #eee
+  text-shadow: 0.1em 0.1em 0.3em black
+  -webkit-transition: all 600ms ease-in-out
+  -moz-transition: all 600ms ease-in-out
+  -o-transition: all 600ms ease-in-out
+  transition: all 600ms ease-in-out
+  &.in
+    top: 23px
+
+
+
+#row
+  height: 100%
+  width: 100%
+  display: block
+
+#edit_col
+  display: block
+  float: left
+  height: 100%
+  min-height: 30px
+  width: 50%
+  margin: 0
+  box-sizing: border-box
+  overflow: auto
+  textarea
+    background-color: #f2f2f2
+    border: none
+    box-sizing: border-box
+    resize: none
+    margin: 0
+    padding 6px
+    width: 100%
+    height: 100%
+    padding: 9px
+    font:
+      family: Droid Sans Mono, Courier New, monospace
+      size: 0.9em
+    line-height: 1.4em
+    color: #333
+    // this would kind of fix the layout in firefox which doesn't seem to undersand box-sizing but naaaa
+    // margin: 1%
+    // padding: 0
+    // width: 97.5%
+    // height: 97.5%
+    &:focus
+      box-shadow: none
+      border: none
+      outline: none transparent
+
+
+#disp_col
+  display: block
+  float: left
+  margin-left: 0
+  min-height: 30px
+  padding-left: 5px     // this seems to break the layout in firefox 20 which doesn't seem to understand box-sizing
+  box-sizing: border-box
+  overflow: auto
+  height: 100%
+  // this would kind of fix the layout in firefox which doesn't seem to undersand box-sizing but naaaa
+  // div
+  //   width: 99%
+  //   padding-left: 1%
+
+#footer
+  height: $footer_height
+  display: block
+
+
+.dragarea
+  position: absolute
+  top: 0
+  height: 100%
+  width: 4px
+  webkit-user-select: none
+  user-select: none
+  z-index: 10
+  border: outset 2px darkgreen
+  box-sizing: border-box
+  &:hover
+    border: outset 2px green
+    background-color: #666
+    cursor: col-resize
+  &:active
+    border: outset 2px lightgreen
+    background-color: #ccc
+    cursor: col-resize
+
+.resizing
+  cursor: col-resize
+
+#modalscreen
+  display: none
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  opacity: 0.8
+  z-index: 5
+  &.dragover
+    display: block
+    background-color: #fefefe
+  &.dragover::before
+    opacity: 1
+    display: block
+    text-align: center
+    text-shadow: 0.1em 0.1em 0.5em black
+    content: "Drop .md or .coffeelit files here to open!"
+    font-size: 2.5em
+    position: relative
+    margin: 10%
+    padding: 10%
+    left: 0
+    border-radius: 50px
+    border: dashed 10px lightblue
+// ፧
+
