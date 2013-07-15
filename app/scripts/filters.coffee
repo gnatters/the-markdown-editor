@@ -9,12 +9,12 @@ angular.module('mdApp')
   (md) ->  if md and md.length then markdown.toHTML(md) else ''
 
 
-.filter 'scopeCSS', () ->
+.filter 'scopeCSS', ($filter) ->
   # Parses the supplied CSS and restricts it to the scope of the supplied prefix
   # - selectors referencing blacklisted tags are removed
   # - references to body are replaced with the prefix
   # - all other selectors are prefixed so as to limit their scope appropriately
-  (css, prefix) ->
+  (css, prefix, prettify) ->
     doc = document.implementation.createHTMLDocument("")
     styles = document.createElement("style")
     styles.innerText = css
@@ -32,7 +32,15 @@ angular.module('mdApp')
             response += rules[i].cssText + ' '
         else if rules[i].media[0] is 'screen'
           scope_selectors(rules[i].cssRules)
-
     scope_selectors(styles.sheet.cssRules)
     response
 
+
+.filter 'prettifyCSS', () ->
+  (css) ->
+    `css
+    .replace( / { /g , ' {\n  ' )
+    .replace( /; } /g, ';\n}\n' )
+    .replace( / } /g,  '\n}\n'  )
+    .replace( /}/g,    '}\n'    )
+    .replace( /; /g,   ';\n  '  )`

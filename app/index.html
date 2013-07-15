@@ -36,11 +36,11 @@
         </adjustablecol>
 
         <adjustablecol id="html_col">
-          <div ng-bind="$parent.md_raw | md2html"></div>
+          <pre><div ng-bind="$parent.md_raw | md2html"></div></pre>
         </adjustablecol>
 
         <adjustablecol id="css_col">
-          <div ng-bind="styles.css | scopeCSS:'#disp_div'"></div>
+          <pre><div ng-bind="styles.css | scopeCSS: '#disp_div' | prettifyCSS"></div></pre>
         </adjustablecol>
 
       </adjustable-row>

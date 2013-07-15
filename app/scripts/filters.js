@@ -7,8 +7,8 @@
       return '';
     }
   };
-}).filter('scopeCSS', function() {
-  return function(css, prefix) {
+}).filter('scopeCSS', function($filter) {
+  return function(css, prefix, prettify) {
     var blacklist, doc, response, scope_selectors, styles;
 
     doc = document.implementation.createHTMLDocument("");
@@ -55,5 +55,14 @@
     };
     scope_selectors(styles.sheet.cssRules);
     return response;
+  };
+}).filter('prettifyCSS', function() {
+  return function(css) {
+    return css
+    .replace( / { /g , ' {\n  ' )
+    .replace( /; } /g, ';\n}\n' )
+    .replace( / } /g,  '\n}\n'  )
+    .replace( /}/g,    '}\n'    )
+    .replace( /; /g,   ';\n  '  );
   };
 });
