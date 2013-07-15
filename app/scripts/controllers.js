@@ -68,7 +68,7 @@ mdApp.controller('mdCtrl', function($scope, $rootScope, $http, $element, dndFile
     }
   });
   $scope.message = "";
-  $scope.$watch('message', function() {
+  return $scope.$watch('message', function() {
     var t0;
 
     t0 = new Date();
@@ -80,58 +80,4 @@ mdApp.controller('mdCtrl', function($scope, $rootScope, $http, $element, dndFile
       });
     }), 5000);
   });
-  $scope.cols = {};
-  (window.onresize = function() {
-    return $scope.page_width = document.width;
-  })();
-  $scope.drag = {
-    target: null,
-    start: null,
-    ratio_delta: 0
-  };
-  $element[0].onclick = function(e) {
-    return $scope.$apply(function() {
-      return $scope.styles.show = false;
-    });
-  };
-  document.onmouseup = function() {
-    $scope.drag.target = null;
-    $scope.drag.start = null;
-    $scope.drag.before = null;
-    $scope.drag.after = null;
-    return $scope.$digest();
-  };
-  return document.onmousemove = function(e) {
-    var i, others, ratio_delta;
-
-    if ($scope.drag.start && e.which) {
-      ratio_delta = (e.clientX - $scope.drag.start) / $scope.page_width;
-      $scope.cols[$scope.drag.target].ratio = $scope.drag.before + ratio_delta;
-      others = (function() {
-        var _results;
-
-        _results = [];
-        for (i in $scope.cols) {
-          if (parseInt(i) !== $scope.drag.target + 1) {
-            _results.push($scope.cols[i].ratio);
-          }
-        }
-        return _results;
-      })();
-      $scope.cols[$scope.drag.target + 1].ratio = 1 - (others.length ? others.reduce(function(t, s) {
-        return t + s;
-      }) : 0);
-      if ($scope.cols[$scope.drag.target].ratio < 0.1 || $scope.cols[$scope.drag.target + 1].ratio < 0.1) {
-        return false;
-      }
-      $scope.cols[$scope.drag.target].percentage = "" + ($scope.cols[$scope.drag.target].ratio * 100) + "%";
-      $scope.cols[$scope.drag.target + 1].percentage = "" + ($scope.cols[$scope.drag.target + 1].ratio * 100) + "%";
-    } else {
-      $scope.drag.target = null;
-      $scope.drag.start = null;
-      $scope.drag.before = null;
-      $scope.drag.after = null;
-    }
-    return $scope.$digest();
-  };
 });

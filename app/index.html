@@ -24,19 +24,26 @@
 
       <div id="messagearea" ng-bind="message" ng-class="{in:message}"></div>
 
-      <div id="row">
+      <adjustable-row>
 
-        <div id="edit_col" col-width="0,0.5" ng-style="{width: cols[0].percentage}">
-          <textarea id="md_raw" ng-model="md_raw" name="md_raw" autofocus></textarea>
-          <div dragarea=0  ng-style="{left: cols[0].percentage}"></div>
-        </div>
+        <adjustablecol id="edit_col">
+          <textarea id="md_raw" ng-model="$parent.md_raw" name="md_raw" autofocus></textarea>
+        </adjustablecol>
 
-        <div id="disp_col" col-width="1,0.5" ng-style="{width: cols[1].percentage}">
-          <style type="text/css" scoped="scoped" ng-bind="styles.css | scopeCSS:'#disp_col'"></style>
-          <div ng-bind-html-unsafe="md_raw | md2html"></div>
-        </div>
+        <adjustablecol id="disp_col">
+          <style type="text/css" scoped="scoped" ng-bind="styles.css | scopeCSS:'#disp_div'"></style>
+          <div id="disp_div" ng-bind-html-unsafe="$parent.md_raw | md2html"></div>
+        </adjustablecol>
 
-      </div>
+        <adjustablecol id="html_col">
+          <div ng-bind="$parent.md_raw | md2html"></div>
+        </adjustablecol>
+
+        <adjustablecol id="css_col">
+          <div ng-bind="styles.css | scopeCSS:'#disp_div'"></div>
+        </adjustablecol>
+
+      </adjustable-row>
 
       <div id="footer"></div>
 
@@ -74,12 +81,10 @@
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
-
     <script src="scripts/services.js"></script>
     <script src="scripts/filters.js"></script>
     <script src="scripts/controllers.js"></script>
     <script src="scripts/directives.js"></script>
-
     <!-- endbuild -->
 
 </body>

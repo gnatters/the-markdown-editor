@@ -55,38 +55,4 @@ mdApp.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
     setTimeout (() -> $scope.$apply () -> $scope.message = "" if new Date() - t0 >=5000 ), 5000
 
 
-  $scope.cols = {}
-
-  (window.onresize = () -> $scope.page_width = document.width)()
-
-  $scope.drag =
-    target: null
-    start: null
-    ratio_delta: 0
-
-  $element[0].onclick = (e) -> $scope.$apply () -> $scope.styles.show = false
-
-  document.onmouseup = () ->
-    $scope.drag.target = null
-    $scope.drag.start = null
-    $scope.drag.before = null
-    $scope.drag.after = null
-    $scope.$digest()
-
-  document.onmousemove = (e) ->
-    if $scope.drag.start and e.which
-      ratio_delta = (e.clientX - $scope.drag.start) / $scope.page_width
-      $scope.cols[$scope.drag.target].ratio = ($scope.drag.before + ratio_delta)
-      others = ($scope.cols[i].ratio for i of $scope.cols when  parseInt(i) isnt $scope.drag.target+1)
-      $scope.cols[$scope.drag.target+1].ratio =  1  - (if others.length  then others.reduce (t, s) -> t + s else 0)
-      return false if $scope.cols[$scope.drag.target].ratio < 0.1 or $scope.cols[$scope.drag.target+1].ratio < 0.1
-      $scope.cols[$scope.drag.target].percentage = "#{$scope.cols[$scope.drag.target].ratio*100}%"
-      $scope.cols[$scope.drag.target+1].percentage = "#{$scope.cols[$scope.drag.target+1].ratio*100}%"
-    else
-      $scope.drag.target = null
-      $scope.drag.start = null
-      $scope.drag.before = null
-      $scope.drag.after = null
-    $scope.$digest()
-
 
