@@ -34,7 +34,7 @@ angular.module('mdApp')
         prev_col.div.append $compile('<dragarea></dragarea>')(prev_col)
 
     right_percentage = (index) ->
-      "#{((c.ratio for c in cols when c.index <= index).reduce(((t, s) -> t + s), 0))*100}%"
+      "#{((c.ratio for c in cols when c.index <= index).reduce(((t, s) -> t + s), 0))*100}%" #errrr
 
     dragged = (x) =>
       $scope.$apply () =>

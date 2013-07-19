@@ -25,7 +25,6 @@ mdApp.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
   dndFile.ondrop ((e) -> $scope.$apply () -> $scope.dragover = false), false
   dndFile.onfileload (e) -> $scope.$apply () -> $scope.md_raw = e.target.result
 
-
   $scope.styles =
     css: ''
     active: 'markdowncss'
@@ -34,7 +33,6 @@ mdApp.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
       markdowncss: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css')
       GitHub: '/styles/md/github.css'
     external: ''
-
 
   $scope.$watch 'styles.active', () ->
     css_location = if $scope.styles.available[$scope.styles.active]
@@ -48,11 +46,9 @@ mdApp.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
       proxyurl = $rootScope.corsproxy($scope.styles.external)
       $http.get(proxyurl).then((response) -> $scope.styles.css = response.data) if proxyurl
 
-
   $scope.message = ""
   $scope.$watch 'message', () ->
     t0 = new Date()
     setTimeout (() -> $scope.$apply () -> $scope.message = "" if new Date() - t0 >=5000 ), 5000
-
 
 

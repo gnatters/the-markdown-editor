@@ -27,20 +27,20 @@
       <adjustable-row>
 
         <adjustablecol id="edit_col">
-          <textarea id="md_raw" ng-model="$parent.md_raw" name="md_raw" autofocus></textarea>
+          <textarea id="md_raw" ng-model="$parent.md_raw" name="md_raw" autofocus spellcheck="false"></textarea>
+        </adjustablecol>
+
+        <adjustablecol id="css_col">
+          <textarea spellcheck="false">{{styles.css | scopeCSS: '#disp_div' | prettifyCSS}}</textarea>
+        </adjustablecol>
+
+        <adjustablecol id="html_col">
+          <pre><div ng-bind="$parent.md_raw | md2html | prettifyHTML"></div></pre>
         </adjustablecol>
 
         <adjustablecol id="disp_col">
           <style type="text/css" scoped="scoped" ng-bind="styles.css | scopeCSS:'#disp_div'"></style>
           <div id="disp_div" ng-bind-html-unsafe="$parent.md_raw | md2html"></div>
-        </adjustablecol>
-
-        <adjustablecol id="html_col">
-          <pre><div ng-bind="$parent.md_raw | md2html"></div></pre>
-        </adjustablecol>
-
-        <adjustablecol id="css_col">
-          <pre><div ng-bind="styles.css | scopeCSS: '#disp_div' | prettifyCSS"></div></pre>
         </adjustablecol>
 
       </adjustable-row>

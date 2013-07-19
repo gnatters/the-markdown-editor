@@ -65,4 +65,104 @@
     .replace( /}/g,    '}\n'    )
     .replace( /; /g,   ';\n  '  );
   };
+}).filter('prettifyHTML', function() {
+  var closing, count_inline, indent, inline, tag_re;
+
+  indent = function(n, inline_count) {
+    if (n <= 0) {
+      return "";
+    } else {
+      return Array(n - inline_count + 1).join('  ');
+    }
+  };
+  inline = function(tag) {
+    return tag === 'span' || tag === 'a' || tag === 'code' || tag === 'i' || tag === 'b' || tag === 'em' || tag === 'strong' || tag === 'abbr' || tag === 'img' || tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6' || tag === 'bdi' || tag === 'bdo' || tag === 'wbr' || tag === 'kbd' || tag === 'del' || tag === 'ins' || tag === 's' || tag === 'rt' || tag === 'rp' || tag === 'var' || tag === 'time' || tag === 'sub' || tag === 'sup' || tag === 'link' || tag === 'title' || tag === 'label' || tag === 'input';
+  };
+  closing = function(tag) {
+    return tag === 'area' || tag === 'br' || tag === 'col' || tag === 'embed' || tag === 'hr' || tag === 'img' || tag === 'input' || tag === 'keygen' || tag === 'link' || tag === 'meta' || tag === 'base' || tag === 'param' || tag === 'source' || tag === 'track' || tag === 'wbr';
+  };
+  count_inline = function(stack) {
+    var t;
+
+    return ((function() {
+      var _i, _len, _results;
+
+      _results = [];
+      for (_i = 0, _len = stack.length; _i < _len; _i++) {
+        t = stack[_i];
+        if (inline(t)) {
+          _results.push(t);
+        }
+      }
+      return _results;
+    })()).length;
+  };
+  tag_re = '<(?:(?:(\\w+)[^><]*?)|(?:\\/(\\w+)))>';
+  tag_re = new RegExp(tag_re);
+  tag_re.compile(tag_re);
+  return function(html) {
+    var i, inline_count, last_t, m, pretty_html, saved, stack, tag_name;
+
+    saved = html;
+    inline_count = 0;
+    stack = [];
+    pretty_html = "";
+    while (html) {
+      i = html.search(tag_re);
+      if (!(i + 1)) {
+        pretty_html += html;
+        html = "";
+      }
+      m = html.match(tag_re);
+      if (tag_name = m[1]) {
+        if (inline(tag_name)) {
+          if (pretty_html.charAt(pretty_html.length - 1) === '\n') {
+            pretty_html += indent(stack.length, inline_count);
+          }
+          pretty_html += html.substr(0, i + m[0].length);
+          stack.push(tag_name);
+          inline_count += 1;
+          html = html.substr(i + m[0].length);
+        } else {
+          if (i && pretty_html.charAt(pretty_html.length - 1) === '\n') {
+            pretty_html += indent(stack.length, inline_count);
+          }
+          pretty_html += "" + (html.substr(0, i));
+          if (pretty_html.charAt(pretty_html.length - 1) !== '\n') {
+            pretty_html += '\n';
+          }
+          pretty_html += indent(stack.length, inline_count) + m[0];
+          stack.push(tag_name);
+          pretty_html += '\n';
+          html = html.substr(i + m[0].length);
+        }
+      } else if (tag_name = m[2]) {
+        last_t = stack.lastIndexOf(tag_name);
+        if (last_t + 1) {
+          if (inline(tag_name)) {
+            inline_count -= 1;
+            stack.splice(last_t);
+            pretty_html += "" + (html.substr(0, i)) + m[0];
+            html = html.substr(i + m[0].length);
+          } else {
+            if (i && pretty_html.charAt(pretty_html.length - 1) === '\n') {
+              pretty_html += indent(stack.length, inline_count);
+            }
+            stack.splice(last_t);
+            pretty_html += "" + (html.substr(0, i)) + (pretty_html.charAt(pretty_html.length - 1) === '\n' ? '' : '\n') + (indent(stack.length, inline_count)) + m[0];
+            html = html.substr(i + m[0].length);
+            if (html[0] !== '\n') {
+              pretty_html += '\n';
+            }
+          }
+        } else {
+          pretty_html += "" + (html.substr(0, i + m[0].length));
+          html = html.substr(i + m[0].length);
+        }
+      } else {
+        console.warn("UH OH: found a tag that's not an opening tag or a closing tag!?!?");
+      }
+    }
+    return pretty_html;
+  };
 });
