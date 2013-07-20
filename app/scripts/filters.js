@@ -59,11 +59,13 @@
 }).filter('prettifyCSS', function() {
   return function(css) {
     return css
-    .replace( / { /g , ' {\n  ' )
-    .replace( /; } /g, ';\n}\n' )
-    .replace( / } /g,  '\n}\n'  )
-    .replace( /}/g,    '}\n'    )
-    .replace( /; /g,   ';\n  '  );
+    .replace( /^\s+/g,    ''        )
+    .replace( /\s*,\s*/g, ', '      )
+    .replace( /\s*{\s*/g, ' {\n  '  )
+    .replace( /\s*;\s*/g, ';\n  '   )
+    .replace( /\*\//g,    '*/\n'    )
+    .replace( /\n\n+/g,   '\n'      )
+    .replace( /\s*}\s*/g, '\n}\n\n' );
   };
 }).filter('prettifyHTML', function() {
   var closing, count_inline, indent, inline, tag_re;
@@ -149,6 +151,7 @@
               pretty_html += indent(stack.length, inline_count);
             }
             stack.splice(last_t);
+            inline_count = count_inline(stack);
             pretty_html += "" + (html.substr(0, i)) + (pretty_html.charAt(pretty_html.length - 1) === '\n' ? '' : '\n') + (indent(stack.length, inline_count)) + m[0];
             html = html.substr(i + m[0].length);
             if (html[0] !== '\n') {

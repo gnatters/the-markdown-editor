@@ -40,11 +40,13 @@ angular.module('mdApp')
 .filter 'prettifyCSS', () ->
   (css) ->
     `css
-    .replace( / { /g , ' {\n  ' )
-    .replace( /; } /g, ';\n}\n' )
-    .replace( / } /g,  '\n}\n'  )
-    .replace( /}/g,    '}\n'    )
-    .replace( /; /g,   ';\n  '  )`
+    .replace( /^\s+/g,    ''        )
+    .replace( /\s*,\s*/g, ', '      )
+    .replace( /\s*{\s*/g, ' {\n  '  )
+    .replace( /\s*;\s*/g, ';\n  '   )
+    .replace( /\*\//g,    '*/\n'    )
+    .replace( /\n\n+/g,   '\n'      )
+    .replace( /\s*}\s*/g, '\n}\n\n' )`
 
 
 .filter 'prettifyHTML', () ->
@@ -96,6 +98,7 @@ angular.module('mdApp')
           else # close block tag
             pretty_html += indent(stack.length, inline_count) if i and pretty_html.charAt(pretty_html.length-1) is '\n'
             stack.splice(last_t)
+            inline_count = count_inline(stack)
             pretty_html += "#{html.substr(0,i)}#{ if pretty_html.charAt(pretty_html.length-1) is '\n' then '' else '\n'}#{indent(stack.length, inline_count)}#{m[0]}"
             html = html.substr(i+m[0].length)
             pretty_html += '\n' unless html[0] is '\n'
@@ -106,6 +109,4 @@ angular.module('mdApp')
       else # um wut?
         console.warn "UH OH: found a tag that's not an opening tag or a closing tag!?!?"
     pretty_html
-
-## is inline_count being decremented correctly in case of incorrectly embedded closing tags?
 

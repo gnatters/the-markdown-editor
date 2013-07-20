@@ -13,7 +13,7 @@ The Markdown Editor\n
 
 angular.module('mdApp')
 
-.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
+.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile, $filter) ->
   $scope.md_raw = default_md
   $scope.dragover = false
 
@@ -25,32 +25,59 @@ angular.module('mdApp')
   dndFile.ondrop ((e) -> $scope.$apply () -> $scope.dragover = false), false
   dndFile.onfileload (e) -> $scope.$apply () -> $scope.md_raw = e.target.result
 
+  $element.bind 'click', (e) -> $scope.$broadcast('ctrlClicked')
+
   $scope.style =
-    css: ''
     active: 'markdowncss'
     sheets:
       markdowncss:
         source: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css')
+        native: true
       GitHub:
         source: '/styles/md/github.css'
-        # css
-        # external
-        # edited
+        native: true
     external: ''
+    editor: ''
+
+  $scope.copy_style = (e,style_name) ->
+    $rootScope.kill_event(e)
+    copy = _.clone $scope.style.sheets[style_name]
+    style_name = style_name.match(/(.*?)(:? copy(:? \d+)?)?$/)[1]
+    name = "#{style_name} copy"
+    i = 0
+    name = "#{style_name} copy #{++i}" while name of $scope.style.sheets
+    copy.native = false
+    $scope.style.sheets[name] = copy
+    $scope.style.active = name
+
+
+  $scope.delete_style = (e,style_name) ->
+    $rootScope.kill_event(e)
+    delete $scope.style.sheets[style_name]
+    $scope.style.active = Object.keys($scope.style.sheets)[0] if $scope.style.active is style_name
+
 
   $scope.$watch 'style.active', () ->
     if $scope.style.active of $scope.style.sheets
       style = $scope.style.sheets[$scope.style.active]
-      unless style.css
-        $http.get(style.source).then (response) -> style.css = response.data
+      if style.css
+        $scope.style.editor = $filter('prettifyCSS')(style.css)
+      else
+        $http.get(style.source).then (response) ->
+          style.css = response.data
+          $scope.style.editor = $filter('prettifyCSS')(style.css)
+
+  $scope.$watch 'style.editor', () ->
+    style = $scope.style.sheets[$scope.style.active]
+    # unless style.edited
+    $scope.style.sheets[$scope.style.active].css = $scope.style.editor
 
   $scope.$watch 'style.external', () ->
-    return unless $scope.style.external
+    return unless $scope.style.external and /^(https?:\/\/)?(\w+\.)+[\w\/]+/.test $scope.style.external
     $http.get($rootScope.corsproxy($scope.style.external)).then (response) ->
       i = 0
-      name = "external_#{i}"
-      name = "external_#{++i}" while name of $scope.style.sheets
-      console.log $scope.style
+      name = "external"
+      name = "external #{++i}" while name of $scope.style.sheets
       $scope.style.sheets[name] =
         source: $scope.style.external
         css: response.data
@@ -63,4 +90,5 @@ angular.module('mdApp')
   $scope.$watch 'message', () ->
     t0 = new Date()
     setTimeout (() -> $scope.$apply () -> $scope.message = "" if new Date() - t0 >=5000 ), 5000
+
 

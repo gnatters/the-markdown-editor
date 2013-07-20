@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="styles/normalize.css">
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 </head>
   <body>
 
@@ -31,7 +33,7 @@
         </adjustablecol>
 
         <adjustablecol id="css_col">
-          <textarea spellcheck="false" ng-bind="style.sheets[style.active].css | scopeCSS:'#disp_div' | prettifyCSS"></textarea>
+          <textarea spellcheck="false" ng-model="$parent.style.editor"></textarea>
         </adjustablecol>
 
         <adjustablecol id="html_col">
@@ -59,9 +61,6 @@
       <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
 
-    <!-- Add your site or application content here -->
-    <div class="container" ng-view=""></div>
-
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
       var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
@@ -72,6 +71,7 @@
 
     <script src="bower_components/angular/angular.js"></script>
     <script src="scripts/markdown.js"></script>
+    <script src="scripts/underscore.min.js"></script>
 
     <!-- build:js scripts/modules.js -->
     <script src="bower_components/angular-resource/angular-resource.js"></script>

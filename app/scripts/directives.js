@@ -165,9 +165,15 @@ angular.module('mdApp').directive('adjustableRow', function() {
   return {
     restrict: 'E',
     replace: true,
-    template: '<div id="theme-selector">' + '<span>Theme ▾</span>' + '<ul class="list" ng-show="show">' + '<li ng-repeat="(style, location) in style.sheets" ng-click="$parent.style.active=style" ng-class="{active_style:$parent.style.active==style}">{{style}}</li>' + '<li ng-click="select_ext($event)" ng-class="{active_style:style.active==\'external\'}">' + '<label for="external-css">External:</label>' + '<input id="styles_external" ng-model="style.external"  ng-keydown="keydown_input($event)" type="text" name="external-css" id="external-css" placeholder="http://">' + '</li>' + '</ul>' + '</div>',
+    scope: true,
+    template: '<div id="theme-selector" class="menu">' + '<span class="menu-title">Themes ▾</span>' + '<ul class="menu-items" ng-show="show">' + '<li class="menu-item" ng-repeat="(style, props) in style.sheets" ng-click="$parent.style.active=style" ng-class="{active_style:$parent.style.active==style}">{{style}}' + '<ul class="menu-actions">' + '<li class="icon-trash" ng-click="!props.native && delete_style($event, style)" ng-class="{inactive:props.native}" title="Delete styles"></li>' + '<li class="icon-copy" ng-click="copy_style($event, style)" title="Duplicate styles"></li>' + '<li class="icon-save" ng-show="false" title="Save styles"></li>' + '</ul>' + '</li>' + '<li class="menu-item" ng-click="select_ext($event)" ng-class="{active_style:style.active==\'external\'}">' + '<label for="external-css">External: </label>' + '<input id="styles_external" ng-model="style.external"  ng-keydown="keydown_input($event)" type="text" name="external-css" id="external-css" placeholder="http://">' + '</li>' + '</ul>' + '</div>',
     link: function(scope, elm, attrs, $rootScope) {
       scope.show = false;
+      scope.$on('ctrlClicked', function() {
+        return scope.$apply(function() {
+          return scope.show = false;
+        });
+      });
       elm.children()[0].addEventListener('click', function(e) {
         kill_event(e);
         return scope.$apply(function() {

@@ -4,7 +4,7 @@ var default_md;
 
 default_md = "The Markdown Editor\n===\n\n* Edit's made on the left panel instantly render on the right\n* Drag the middle divider to resize panels\n* Drag and drop a `.md` or `.litcoffee` file into this window to load it\n* <span style='color:pink; background-color:darkred; padding:5px; border-radius:8px'>HTML is allowed too!</span>\n";
 
-angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http, $element, dndFile) {
+angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http, $element, dndFile, $filter) {
   $scope.md_raw = default_md;
   $scope.dragover = false;
   dndFile.init($element[0]);
@@ -33,44 +33,79 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http,
       return $scope.md_raw = e.target.result;
     });
   });
+  $element.bind('click', function(e) {
+    return $scope.$broadcast('ctrlClicked');
+  });
   $scope.style = {
-    css: '',
     active: 'markdowncss',
     sheets: {
       markdowncss: {
-        source: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css')
+        source: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css'),
+        "native": true
       },
       GitHub: {
-        source: '/styles/md/github.css'
+        source: '/styles/md/github.css',
+        "native": true
       }
     },
-    external: ''
+    external: '',
+    editor: ''
+  };
+  $scope.copy_style = function(e, style_name) {
+    var copy, i, name;
+
+    $rootScope.kill_event(e);
+    copy = _.clone($scope.style.sheets[style_name]);
+    style_name = style_name.match(/(.*?)(:? copy(:? \d+)?)?$/)[1];
+    name = "" + style_name + " copy";
+    i = 0;
+    while (name in $scope.style.sheets) {
+      name = "" + style_name + " copy " + (++i);
+    }
+    copy["native"] = false;
+    $scope.style.sheets[name] = copy;
+    return $scope.style.active = name;
+  };
+  $scope.delete_style = function(e, style_name) {
+    $rootScope.kill_event(e);
+    delete $scope.style.sheets[style_name];
+    if ($scope.style.active === style_name) {
+      return $scope.style.active = Object.keys($scope.style.sheets)[0];
+    }
   };
   $scope.$watch('style.active', function() {
     var style;
 
     if ($scope.style.active in $scope.style.sheets) {
       style = $scope.style.sheets[$scope.style.active];
-      if (!style.css) {
+      if (style.css) {
+        return $scope.style.editor = $filter('prettifyCSS')(style.css);
+      } else {
         return $http.get(style.source).then(function(response) {
-          return style.css = response.data;
+          style.css = response.data;
+          return $scope.style.editor = $filter('prettifyCSS')(style.css);
         });
       }
     }
   });
+  $scope.$watch('style.editor', function() {
+    var style;
+
+    style = $scope.style.sheets[$scope.style.active];
+    return $scope.style.sheets[$scope.style.active].css = $scope.style.editor;
+  });
   $scope.$watch('style.external', function() {
-    if (!$scope.style.external) {
+    if (!($scope.style.external && /^(https?:\/\/)?(\w+\.)+[\w\/]+/.test($scope.style.external))) {
       return;
     }
     return $http.get($rootScope.corsproxy($scope.style.external)).then(function(response) {
       var i, name;
 
       i = 0;
-      name = "external_" + i;
+      name = "external";
       while (name in $scope.style.sheets) {
-        name = "external_" + (++i);
+        name = "external " + (++i);
       }
-      console.log($scope.style);
       $scope.style.sheets[name] = {
         source: $scope.style.external,
         css: response.data,
