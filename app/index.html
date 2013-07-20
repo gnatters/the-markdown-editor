@@ -31,7 +31,7 @@
         </adjustablecol>
 
         <adjustablecol id="css_col">
-          <textarea spellcheck="false">{{styles.css | scopeCSS: '#disp_div' | prettifyCSS}}</textarea>
+          <textarea spellcheck="false" ng-bind="style.sheets[style.active].css | scopeCSS:'#disp_div' | prettifyCSS"></textarea>
         </adjustablecol>
 
         <adjustablecol id="html_col">
@@ -39,7 +39,7 @@
         </adjustablecol>
 
         <adjustablecol id="disp_col">
-          <style type="text/css" scoped="scoped" ng-bind="styles.css | scopeCSS:'#disp_div'"></style>
+          <style type="text/css" scoped="scoped" ng-bind="style.sheets[style.active].css | scopeCSS:'#disp_div'"></style>
           <div id="disp_div" ng-bind-html-unsafe="$parent.md_raw | md2html"></div>
         </adjustablecol>
 

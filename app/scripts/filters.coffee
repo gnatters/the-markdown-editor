@@ -36,6 +36,7 @@ angular.module('mdApp')
     response
 
 
+
 .filter 'prettifyCSS', () ->
   (css) ->
     `css
@@ -106,5 +107,5 @@ angular.module('mdApp')
         console.warn "UH OH: found a tag that's not an opening tag or a closing tag!?!?"
     pretty_html
 
-
+## is inline_count being decremented correctly in case of incorrectly embedded closing tags?
 

@@ -165,23 +165,23 @@ angular.module('mdApp').directive('adjustableRow', function() {
   return {
     restrict: 'E',
     replace: true,
-    template: '<div id="theme-selector">' + '<span>Theme ▾</span>' + '<ul class="list" ng-show="styles.show">' + '<li ng-repeat="(style, location) in styles.available" ng-click="styles.active=style" ng-class="{active_style:styles.active==style}">{{style}}</li>' + '<li ng-click="styles.active=\'external\'" ng-class="{active_style:styles.active==\'external\'}">' + '<label for="external-css">External:</label>' + '<input id="styles_external" ng-model="styles.external" ng-click="clicked_input($event)" ng-keydown="keydown_input($event)" type="text" name="external-css" id="external-css" placeholder="http://">' + '</li>' + '</ul>' + '</div>',
+    template: '<div id="theme-selector">' + '<span>Theme ▾</span>' + '<ul class="list" ng-show="show">' + '<li ng-repeat="(style, location) in style.sheets" ng-click="$parent.style.active=style" ng-class="{active_style:$parent.style.active==style}">{{style}}</li>' + '<li ng-click="select_ext($event)" ng-class="{active_style:style.active==\'external\'}">' + '<label for="external-css">External:</label>' + '<input id="styles_external" ng-model="style.external"  ng-keydown="keydown_input($event)" type="text" name="external-css" id="external-css" placeholder="http://">' + '</li>' + '</ul>' + '</div>',
     link: function(scope, elm, attrs, $rootScope) {
+      scope.show = false;
       elm.children()[0].addEventListener('click', function(e) {
         kill_event(e);
         return scope.$apply(function() {
-          return scope.styles.show = !scope.styles.show;
+          return scope.show = !scope.show;
         });
       });
-      scope.clicked_input = function(e) {
+      scope.select_ext = function(e) {
         kill_event(e);
-        return scope.styles.active = 'external';
+        return styles_external.focus();
       };
       return styles_external.onkeydown = function(e) {
         if ((e.which || e.keyCode) === 13) {
           return scope.$apply(function() {
-            scope.styles.active = 'external';
-            return scope.styles.show = false;
+            return scope.show = false;
           });
         }
       };

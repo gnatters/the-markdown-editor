@@ -11,13 +11,13 @@ The Markdown Editor\n
 * <span style='color:pink; background-color:darkred; padding:5px; border-radius:8px'>HTML is allowed too!</span>\n
 "
 
+angular.module('mdApp')
 
-mdApp = angular.module('mdApp')
-
-
-mdApp.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
+.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
   $scope.md_raw = default_md
   $scope.dragover = false
+
+  # drag and drop behavoir
   dndFile.init $element[0]
   dndFile.onactive   () -> $scope.$apply () -> $scope.dragover = true
   dndFile.oninactive () -> $scope.$apply () -> $scope.dragover = false
@@ -25,30 +25,42 @@ mdApp.controller 'mdCtrl', ($scope, $rootScope, $http, $element, dndFile) ->
   dndFile.ondrop ((e) -> $scope.$apply () -> $scope.dragover = false), false
   dndFile.onfileload (e) -> $scope.$apply () -> $scope.md_raw = e.target.result
 
-  $scope.styles =
+  $scope.style =
     css: ''
     active: 'markdowncss'
-    show: false
-    available:
-      markdowncss: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css')
-      GitHub: '/styles/md/github.css'
+    sheets:
+      markdowncss:
+        source: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css')
+      GitHub:
+        source: '/styles/md/github.css'
+        # css
+        # external
+        # edited
     external: ''
 
-  $scope.$watch 'styles.active', () ->
-    css_location = if $scope.styles.available[$scope.styles.active]
-      $scope.styles.available[$scope.styles.active]
-    else if $scope.styles.active is 'external' then $rootScope.corsproxy($scope.styles.external)
-    if css_location
-      $http.get(css_location).then (response) -> $scope.styles.css = response.data
+  $scope.$watch 'style.active', () ->
+    if $scope.style.active of $scope.style.sheets
+      style = $scope.style.sheets[$scope.style.active]
+      unless style.css
+        $http.get(style.source).then (response) -> style.css = response.data
 
-  $scope.$watch 'styles.external', () ->
-    if $scope.styles.active is 'external'
-      proxyurl = $rootScope.corsproxy($scope.styles.external)
-      $http.get(proxyurl).then((response) -> $scope.styles.css = response.data) if proxyurl
+  $scope.$watch 'style.external', () ->
+    return unless $scope.style.external
+    $http.get($rootScope.corsproxy($scope.style.external)).then (response) ->
+      i = 0
+      name = "external_#{i}"
+      name = "external_#{++i}" while name of $scope.style.sheets
+      console.log $scope.style
+      $scope.style.sheets[name] =
+        source: $scope.style.external
+        css: response.data
+        external: true
+        edited: false
+      $scope.style.active = name
+      $scope.style.external = ''
 
   $scope.message = ""
   $scope.$watch 'message', () ->
     t0 = new Date()
     setTimeout (() -> $scope.$apply () -> $scope.message = "" if new Date() - t0 >=5000 ), 5000
-
 

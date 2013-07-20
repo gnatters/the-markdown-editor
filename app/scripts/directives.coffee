@@ -95,26 +95,26 @@ angular.module('mdApp')
   template:
     '<div id="theme-selector">' +
       '<span>Theme ▾</span>' +
-      '<ul class="list" ng-show="styles.show">' +
-        '<li ng-repeat="(style, location) in styles.available" ng-click="styles.active=style" ng-class="{active_style:styles.active==style}">{{style}}</li>' +
-        '<li ng-click="styles.active=\'external\'" ng-class="{active_style:styles.active==\'external\'}">' +
+      '<ul class="list" ng-show="show">' +
+        '<li ng-repeat="(style, location) in style.sheets" ng-click="$parent.style.active=style" ng-class="{active_style:$parent.style.active==style}">{{style}}</li>' +
+        '<li ng-click="select_ext($event)" ng-class="{active_style:style.active==\'external\'}">' +
         	'<label for="external-css">External:</label>' +
-        	'<input id="styles_external" ng-model="styles.external" ng-click="clicked_input($event)" ng-keydown="keydown_input($event)" type="text" name="external-css" id="external-css" placeholder="http://">' +
+        	'<input id="styles_external" ng-model="style.external"  ng-keydown="keydown_input($event)" type="text" name="external-css" id="external-css" placeholder="http://">' +
         '</li>' +
       '</ul>' +
     '</div>'
   link: (scope, elm, attrs, $rootScope) ->
+    scope.show = false
     elm.children()[0].addEventListener 'click', (e) ->
       kill_event(e)
-      scope.$apply () -> scope.styles.show = !scope.styles.show # toggle styles menu
+      scope.$apply () -> scope.show = !scope.show # toggle styles menu
 
-    scope.clicked_input = (e) ->
+    scope.select_ext = (e) ->
       kill_event(e)
-      scope.styles.active = 'external'
+      styles_external.focus()
 
     styles_external.onkeydown = (e) ->
       if (e.which or e.keyCode) is 13
         scope.$apply () ->
-          scope.styles.active = 'external'
-          scope.styles.show = false
+          scope.show = false
 
