@@ -18,12 +18,24 @@ angular.module('mdApp')
   $scope.dragover = false
 
   # drag and drop behavoir
-  dndFile.init $element[0]
+  dndFile.init $element[0],
   dndFile.onactive   () -> $scope.$apply () -> $scope.dragover = true
   dndFile.oninactive () -> $scope.$apply () -> $scope.dragover = false
   $element[0].addEventListener 'mousemove', () -> $scope.$apply () -> $scope.dragover = false
   dndFile.ondrop ((e) -> $scope.$apply () -> $scope.dragover = false), false
-  dndFile.onfileload (e) -> $scope.$apply () -> $scope.md_raw = e.target.result
+  dndFile.onfileload (e) ->
+    $scope.$apply () ->
+      if e.fileExt in ['md', 'litcoffee']
+        $scope.md_raw = e.target.result
+      else if e.fileExt is 'css'
+        name = e.fileName
+        i = 0
+        name = "#{e.fileName} #{++i}" while name of $scope.style.sheets
+        $scope.style.sheets[name] =
+          source: 'dragged file'
+          native: false
+          css: e.target.result
+        $scope.style.active = name
 
   $element.bind 'click', (e) -> $scope.$broadcast('ctrlClicked')
 

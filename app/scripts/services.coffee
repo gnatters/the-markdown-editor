@@ -5,15 +5,23 @@ angular.module('mdApp')
 
 
 .service 'dndFile', ($rootScope) ->
-  # provides Drag aNd Drop behavoirs for local files
+  # provides Drag 'n' Drop behavoirs for local files
+  allowed_file_exts = /\.(md|litcoffee|css)$/
+
+  load_first_file_matching = (files, regexp) =>
+    if mdfile = (()->(return f for f in files when regexp.test(f.name)))()
+      reader = new FileReader()
+      reader.onload = (e) =>
+        e.fileName = mdfile.name.replace regexp, ''
+        e.fileExt  = mdfile.name.match(regexp)[1]
+        @callbacks.fileload(e)
+      reader.readAsText(mdfile)
+
   default_drop = (e) =>
     files = e.dataTransfer.files
-    count = files.length
-    if count
-      if file = (()->(return f for f in files when /.(md|litcoffee)$/.test(f.name)))()
-        reader = new FileReader()
-        reader.onload = @callbacks.fileload
-        reader.readAsText(file)
+    if files.length
+      load_first_file_matching files, /\.(md|litcoffee)$/
+      load_first_file_matching files, /\.(css)$/
 
   @callbacks =
     active: (e) ->
@@ -23,11 +31,11 @@ angular.module('mdApp')
     default_drop: default_drop
 
   init: (elm) =>
-    elm.addEventListener "dragenter", (e) =>  $rootScope.kill_event(e); @callbacks.active(e)
-    elm.addEventListener "dragover",  (e) =>  $rootScope.kill_event(e); @callbacks.active(e)
-    elm.addEventListener "dragexit",  (e) =>  $rootScope.kill_event(e); @callbacks.inactive(e)
+    elm.addEventListener "dragenter", (e) =>  _.kill_event(e); @callbacks.active(e)
+    elm.addEventListener "dragover",  (e) =>  _.kill_event(e); @callbacks.active(e)
+    elm.addEventListener "dragexit",  (e) =>  _.kill_event(e); @callbacks.inactive(e)
     elm.addEventListener "drop", (e) =>
-      $rootScope.kill_event(e)
+      _.kill_event(e)
       @callbacks.drop(e)
       @callbacks.default_drop(e)
   onactive: (cb) => @callbacks.active = cb
