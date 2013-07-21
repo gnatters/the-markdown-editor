@@ -37,6 +37,7 @@ angular.module('mdApp')
           css: e.target.result
         $scope.style.active = name
 
+  # so that menus know to close when the users clicks off of them
   $element.bind 'click', (e) -> $scope.$broadcast('ctrlClicked')
 
   $scope.style =
@@ -80,15 +81,14 @@ angular.module('mdApp')
           $scope.style.editor = $filter('prettifyCSS')(style.css)
 
   $scope.$watch 'style.editor', () ->
-    style = $scope.style.sheets[$scope.style.active]
-    # unless style.edited
     $scope.style.sheets[$scope.style.active].css = $scope.style.editor
 
   $scope.$watch 'style.external', () ->
     return unless $scope.style.external and /^(https?:\/\/)?(\w+\.)+[\w\/]+/.test $scope.style.external
     $http.get(_.corsproxy($scope.style.external)).then (response) ->
       i = 0
-      name = "external"
+      file_name = $scope.style.external.match(/.+?\/(\w+)\.css/)
+      name = file_name and file_name[1] or "external"
       name = "external #{++i}" while name of $scope.style.sheets
       $scope.style.sheets[name] =
         source: $scope.style.external

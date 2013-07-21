@@ -104,9 +104,6 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $http, $element, d
     }
   });
   $scope.$watch('style.editor', function() {
-    var style;
-
-    style = $scope.style.sheets[$scope.style.active];
     return $scope.style.sheets[$scope.style.active].css = $scope.style.editor;
   });
   $scope.$watch('style.external', function() {
@@ -114,10 +111,11 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $http, $element, d
       return;
     }
     return $http.get(_.corsproxy($scope.style.external)).then(function(response) {
-      var i, name;
+      var file_name, i, name;
 
       i = 0;
-      name = "external";
+      file_name = $scope.style.external.match(/.+?\/(\w+)\.css/);
+      name = file_name && file_name[1] || "external";
       while (name in $scope.style.sheets) {
         name = "external " + (++i);
       }
