@@ -67,7 +67,7 @@ html, body
     text-shadow: 0px 1px 2px #ffffff
 .menu
   display: inline-block
-  position: fixed
+  // float left
   margin: 0
   padding: 0
   top: 0
@@ -83,6 +83,7 @@ html, body
   .menu-title:hover
     @include header-gradient(rgba(130,220,130,1), rgba(110,170,110,1), rgba(90,150,90,1))
   .menu-items
+    position: fixed
     margin: 5px 0
     padding: 0
     background-color: rgba(160,160,160,1)
@@ -118,6 +119,12 @@ html, body
     font-size: 0.9em
     left: 4px
     content: '➜'
+    list-style: square
+  .active_col::before
+    position: absolute
+    font-size: 0.9em
+    left: 4px
+    content: '✓'
     list-style: square
   .menu-actions
     background-color: pink

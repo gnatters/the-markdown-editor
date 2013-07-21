@@ -1,10 +1,5 @@
 'use strict'
 
-kill_event = (e) ->
-    e.cancelBubble = true
-    e.stopPropagation()
-    e.preventDefault()
-
 angular.module('mdApp')
 
 
@@ -14,32 +9,45 @@ angular.module('mdApp')
   scope: {}
   replace: true
   template: '<div class="adjustable-row" ng-transclude></div>'
-  controller: ($scope, $element, $compile, $rootScope) ->
+  controller: ($scope, $element, $compile) ->
     $scope.row = $element[0]
-    cols = $scope.cols = []
-    this.addCol = (col) ->
-      len = cols.length
-      new_ratio = 1/(len+1)
-      for c in cols
-        c.ratio = new_ratio
-        c.percentage = "#{new_ratio*100}%"
-        c.right_percentage = right_percentage(c.index)
-      col.index = len
-      col.ratio = new_ratio
-      col.percentage = "#{new_ratio*100}%"
-      cols.push col
+    cols = $scope.$parent.cols = $scope.cols = []
 
-      if col.index > 0
-        prev_col = cols[col.index-1]
-        prev_col.div.append $compile('<dragarea></dragarea>')(prev_col)
+    this.equalCols = (ncols) ->
+      ncols ||= (c for c in cols when c.show).length
+      new_ratio = 1/ncols
+      for c in cols
+        if c.show
+          c.ratio = new_ratio
+          c.percentage = "#{new_ratio*100}%"
+          c.right_percentage = right_percentage(c.index)
+        else
+          c.ratio = 0
+          c.percentage = "0%"
+          c.right_percentage = right_percentage(c.index)
+
+    this.findLastCol = () ->
+      last_shown = null
+      for c in cols
+        c.last_shown = false
+        last_shown = c if c.show
+      last_shown.last_shown = true if last_shown
+
+    this.addCol = (col) ->
+      $scope.$apply () =>
+        col.index = cols.length
+        cols.push col
+        this.equalCols()
+        col.div.append $compile('<dragarea ng-show="!last_shown"></dragarea>')(col)
 
     right_percentage = (index) ->
-      "#{((c.ratio for c in cols when c.index <= index).reduce(((t, s) -> t + s), 0))*100}%" #errrr
+      "#{((c.ratio for c in cols when c.index <= index).reduce(((t, s) -> t + s), 0))*100}%"
 
     dragged = (x) =>
       $scope.$apply () =>
         before = $scope.dragging
-        after = cols[before.index+1]
+        after = cols[i = before.index+1]
+        after = cols[++i] until after.show # could inifinite loop, but should never
         cumRatio = (c.ratio for c in cols when c.index < before.index).reduce(((t, s) -> t + s), 0)
         before.ratio = x / this.row_width - cumRatio
 
@@ -57,11 +65,11 @@ angular.module('mdApp')
     (window.onresize = () => this.row_width = $scope.row.offsetWidth)()
 
     this.start_drag = (col, e) ->
-      $rootScope.kill_event(e)
+      _.kill_event(e)
       $scope.dragging = col
 
     document.onmousemove = (e) ->
-      $rootScope.kill_event(e)
+      _.kill_event(e)
       dragged(e.clientX) if $scope.dragging
 
     document.onmouseup = () -> $scope.dragging = null
@@ -71,14 +79,20 @@ angular.module('mdApp')
   require: '^adjustableRow'
   restrict: 'E'
   transclude: true
-  scope: {}
+  scope:
+    name: '@'
+    show: '@'
   replace: true
-  template: '<div class="adjustable-col" ng-transclude ng-style="{width: percentage}"></div>'
+  template: '<div class="adjustable-col" ng-transclude ng-style="{width: percentage}" ng-show="show"></div>'
+  controller: ($scope) ->
+    $scope.$watch 'show', () ->
+      $scope.ctrl.equalCols()
+      $scope.ctrl.findLastCol()
+
   link: (scope, elm, attrs, adjustableRowCtrl) ->
     scope.div = elm
-    adjustableRowCtrl.addCol(scope)
     scope.ctrl = adjustableRowCtrl
-
+    setTimeout (() -> scope.show = !!scope.show; adjustableRowCtrl.addCol(scope)), 0
 
 .directive 'dragarea', () ->
   restrict: 'E'
@@ -89,12 +103,23 @@ angular.module('mdApp')
     elm.bind 'mousedown', (e) -> scope.ctrl.start_drag(scope, e)
 
 
-.directive 'themeSelector', ($rootScope) ->
+.controller 'menuCtrl', ($scope, $element, $rootScope) ->
+  $scope.show = false
+  $scope.$on 'ctrlClicked', () -> $scope.$apply -> $scope.show = false
+
+  $element[0].children[0].addEventListener 'click', (e) ->
+    _.kill_event(e)
+    show = $scope.show = !$scope.show
+    $rootScope.$broadcast 'ctrlClicked'
+    $scope.$apply () -> $scope.show = show
+
+
+.directive 'themeMenu', ($rootScope) ->
   restrict: 'E'
   replace: true
   scope: true
   template:
-    '<div id="theme-selector" class="menu">' +
+    '<div id="theme-menu" class="menu">' +
       '<span class="menu-title">Themes ▾</span>' +
       '<ul class="menu-items" ng-show="show">' +
         '<li class="menu-item" ng-repeat="(style, props) in style.sheets" ng-click="$parent.style.active=style" ng-class="{active_style:$parent.style.active==style}">{{style}}' +
@@ -110,21 +135,28 @@ angular.module('mdApp')
         '</li>' +
       '</ul>' +
     '</div>'
+  controller: 'menuCtrl'
   link: (scope, elm, attrs, $rootScope) ->
-    scope.show = false
-
-    scope.$on 'ctrlClicked', () -> scope.$apply -> scope.show = false
-
-    elm.children()[0].addEventListener 'click', (e) ->
-      kill_event(e)
-      scope.$apply () -> scope.show = !scope.show # toggle styles menu
-
     scope.select_ext = (e) ->
-      kill_event(e)
+      _.kill_event(e)
       styles_external.focus()
 
     styles_external.onkeydown = (e) ->
       if (e.which or e.keyCode) is 13
         scope.$apply () ->
           scope.show = false
+
+
+.directive 'viewMenu', ($rootScope) ->
+  restrict: 'E'
+  replace: true
+  scope: true
+  template:
+    '<div id="view-menu" class="menu">' +
+      '<span class="menu-title">View ▾</span>' +
+      '<ul class="menu-items" ng-show="show">' +
+        '<li class="menu-item" ng-repeat="col in cols" ng-class="{active_col:col.show}" ng-click="col.show=!col.show">{{col.name}}</li>' +
+      '</ul>' +
+    '</div>'
+  controller: 'menuCtrl'
 

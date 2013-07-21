@@ -4,7 +4,7 @@ var default_md;
 
 default_md = "The Markdown Editor\n===\n\n* Edit's made on the left panel instantly render on the right\n* Drag the middle divider to resize panels\n* Drag and drop a `.md` or `.litcoffee` file into this window to load it\n* <span style='color:pink; background-color:darkred; padding:5px; border-radius:8px'>HTML is allowed too!</span>\n";
 
-angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http, $element, dndFile, $filter) {
+angular.module('mdApp').controller('mdCtrl', function($scope, $http, $element, dndFile, $filter) {
   $scope.md_raw = default_md;
   $scope.dragover = false;
   dndFile.init($element[0]);
@@ -40,7 +40,7 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http,
     active: 'markdowncss',
     sheets: {
       markdowncss: {
-        source: $rootScope.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css'),
+        source: _.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css'),
         "native": true
       },
       GitHub: {
@@ -54,7 +54,7 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http,
   $scope.copy_style = function(e, style_name) {
     var copy, i, name;
 
-    $rootScope.kill_event(e);
+    _.kill_event(e);
     copy = _.clone($scope.style.sheets[style_name]);
     style_name = style_name.match(/(.*?)(:? copy(:? \d+)?)?$/)[1];
     name = "" + style_name + " copy";
@@ -67,7 +67,7 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http,
     return $scope.style.active = name;
   };
   $scope.delete_style = function(e, style_name) {
-    $rootScope.kill_event(e);
+    _.kill_event(e);
     delete $scope.style.sheets[style_name];
     if ($scope.style.active === style_name) {
       return $scope.style.active = Object.keys($scope.style.sheets)[0];
@@ -98,7 +98,7 @@ angular.module('mdApp').controller('mdCtrl', function($scope, $rootScope, $http,
     if (!($scope.style.external && /^(https?:\/\/)?(\w+\.)+[\w\/]+/.test($scope.style.external))) {
       return;
     }
-    return $http.get($rootScope.corsproxy($scope.style.external)).then(function(response) {
+    return $http.get(_.corsproxy($scope.style.external)).then(function(response) {
       var i, name;
 
       i = 0;

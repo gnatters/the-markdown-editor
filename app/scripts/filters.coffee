@@ -36,7 +36,6 @@ angular.module('mdApp')
     response
 
 
-
 .filter 'prettifyCSS', () ->
   (css) ->
     `css

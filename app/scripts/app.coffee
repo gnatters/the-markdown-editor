@@ -7,14 +7,13 @@ mdApp = angular.module('mdApp', ['ngResource'])
   delete $httpProvider.defaults.headers.common['X-Requested-With']
 ])
 
-.run(['$rootScope', ($rootScope) ->
-  $rootScope.kill_event = (e) ->
+
+_.kill_event = (e) ->
     e.cancelBubble = true
     e.stopPropagation()
     e.preventDefault()
 
-  $rootScope.corsproxy = (css_url) ->
-    m = css_url.match(/https?:\/\/(.+)/)
-    return false unless m
-    "http://www.corsproxy.com/#{m[1]}"
-])
+_.corsproxy = (css_url) ->
+  m = css_url.match(/https?:\/\/(.+)/)
+  return false unless m
+  "http://www.corsproxy.com/#{m[1]}"
