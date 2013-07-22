@@ -1,0 +1,8 @@
+{
+  "name": "markdown-js",
+  "version": "v0.4.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/gnatters/markdown-js.git"
+  }
+}

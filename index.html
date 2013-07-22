@@ -1,0 +1,73 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="styles/main.css">
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+</head>
+  <body>
+
+    <div ng-app="mdApp" ng-controller="mdCtrl" id="container" ng-class="{resizing: drag.start}">
+      <div id="header"><span>The Markdown Editor</span><theme-menu></theme-menu><view-menu></view-menu></div>
+
+      <div id="messagearea" ng-bind="message" ng-class="{in:message}"></div>
+
+      <adjustable-row>
+
+        <adjustablecol id="edit_col" name="Markdown" show="show">
+          <textarea id="md_raw" ng-model="$parent.md_raw" name="md_raw" autofocus="" spellcheck="false"></textarea>
+        </adjustablecol>
+
+        <adjustablecol id="css_col" name="CSS">
+          <textarea spellcheck="false" ng-model="$parent.style.editor"></textarea>
+        </adjustablecol>
+
+        <adjustablecol id="html_col" name="Ouput HTML">
+          <pre><div ng-bind="$parent.md_raw | md2html | prettifyHTML"></div></pre>
+        </adjustablecol>
+
+        <adjustablecol id="disp_col" name="Rendered Output" show="show">
+          <style type="text/css" scoped="scoped" ng-bind="style.sheets[style.active].css | scopeCSS:'#disp_div'"></style>
+          <div id="disp_div" ng-bind-html-unsafe="$parent.md_raw | md2html"></div>
+        </adjustablecol>
+
+      </adjustable-row>
+
+      <div id="footer"></div>
+
+      <div id="modalscreen" ng-class="{dragover:dragover}"></div>
+    </div>
+
+    <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+      <script src="bower_components/es5-shim/es5-shim.js"></script>
+      <script src="bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <script>
+      var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src='//www.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+
+    <script src="scripts/modules.js"></script>
+
+    <script src="scripts/scripts.js"></script>
+
+</body>
+</html>
