@@ -125,6 +125,12 @@
           stack.push(tag_name);
           inline_count += 1;
           html = html.substr(i + m[0].length);
+        } else if (closing(tag_name)) {
+          if (pretty_html.charAt(pretty_html.length - 1) === '\n') {
+            pretty_html += indent(stack.length, inline_count);
+          }
+          pretty_html += html.substr(0, i + m[0].length);
+          html = html.substr(i + m[0].length);
         } else {
           if (i && pretty_html.charAt(pretty_html.length - 1) === '\n') {
             pretty_html += indent(stack.length, inline_count);

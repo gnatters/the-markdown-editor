@@ -50,7 +50,7 @@ angular.module('mdApp')
 
 .filter 'prettifyHTML', () ->
   # a simple as possible method for adding sensible whitespace to blocky html
-  # makes no attempt to fail gracefully given malformed html (e.g. unclosed tags without excuse)
+  # doesn't try very hard to fail gracefully given malformed html (e.g. unclosed tags without excuse)
   indent = (n,inline_count)  -> if n <= 0 then "" else Array(n-inline_count+1).join('  ')
   inline = (tag) -> tag in ['span', 'a', 'code', 'i', 'b', 'em', 'strong', 'abbr', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'bdi', 'bdo', 'wbr', 'kbd', 'del', 'ins', 's', 'rt', 'rp', 'var', 'time', 'sub', 'sup', 'link', 'title', 'label', 'input']
   closing = (tag) -> tag in ['area', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'base', 'param', 'source', 'track', 'wbr'] # option can be self closing but usually isn't!
@@ -77,6 +77,10 @@ angular.module('mdApp')
           pretty_html += html.substr(0,i+m[0].length)
           stack.push tag_name
           inline_count += 1
+          html = html.substr(i+m[0].length)
+        else if closing tag_name
+          pretty_html += indent(stack.length, inline_count) if pretty_html.charAt(pretty_html.length-1) is '\n'
+          pretty_html += html.substr(0,i+m[0].length)
           html = html.substr(i+m[0].length)
         else # open block tag
           pretty_html += indent(stack.length, inline_count) if i and pretty_html.charAt(pretty_html.length-1) is '\n'
