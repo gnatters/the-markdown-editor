@@ -121,7 +121,7 @@ angular.module('mdApp')
   template:
     '<div id="theme-menu" class="menu">' +
       '<span class="menu-title">Themes ▾</span>' +
-      '<ul class="menu-items" ng-show="show">' +
+      '<ul class="menu-items" ng-class="{in:show}">' +
         '<li class="menu-item" ng-repeat="(style, props) in style.sheets" ng-click="$parent.style.active=style" ng-class="{active_style:$parent.style.active==style}">{{style}}' +
           '<ul class="menu-actions">' +
             '<li class="icon-trash" ng-click="!props.native && delete_style($event, style)" ng-class="{inactive:props.native}" title="Delete styles"></li>' +
@@ -154,9 +154,21 @@ angular.module('mdApp')
   template:
     '<div id="view-menu" class="menu">' +
       '<span class="menu-title">View ▾</span>' +
-      '<ul class="menu-items" ng-show="show">' +
+      '<ul class="menu-items" ng-class="{in:show}">' +
         '<li class="menu-item" ng-repeat="col in cols" ng-class="{active_col:col.show}" ng-click="col.show=!col.show">{{col.name}}</li>' +
       '</ul>' +
     '</div>'
   controller: 'menuCtrl'
+
+
+.directive 'forkme', () ->
+  restrict: 'E'
+  replace: true
+  template: '<a id="forkme-ribbon" href="https://github.com/gnatters/the-markdown-editor"><img src="images/forkme.png" alt="Fork me on GitHub"></a>'
+  link: (scope, elm, attrs) ->
+    elm.bind 'mousedown', (e) ->
+      e.preventDefault()
+
+
+
 

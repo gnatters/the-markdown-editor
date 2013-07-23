@@ -47,7 +47,7 @@ angular.module('mdApp')
         source: _.corsproxy('http://kevinburke.bitbucket.org/markdowncss/markdown.css')
         native: true
       GitHub:
-        source: '/styles/md/github.css'
+        source: 'styles/md/github.css'
         native: true
     external: ''
     editor: ''

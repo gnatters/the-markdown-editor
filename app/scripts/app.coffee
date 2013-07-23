@@ -13,6 +13,7 @@ _.kill_event = (e) ->
     e.stopPropagation()
     e.preventDefault()
 
+
 _.corsproxy = (css_url) ->
   m = css_url.match(/https?:\/\/(.+)/)
   return false unless m
